@@ -18,10 +18,14 @@ export async function signUpWithPassword(
   }
 
   const supabase = await createClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!;
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { name } },
+    options: {
+      data: { name },
+      emailRedirectTo: `${siteUrl}/auth/callback`,
+    },
   });
 
   if (error) {
