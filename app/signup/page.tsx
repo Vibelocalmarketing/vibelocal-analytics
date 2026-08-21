@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { signUpWithPassword, signInWithGoogle } from "@/lib/auth/actions";
+import { signUpWithPassword } from "@/lib/auth/actions";
 import { Footer } from "@/components/footer";
 
 export default function SignupPage() {
@@ -15,21 +15,6 @@ export default function SignupPage() {
           <h1 className="mb-8 text-center text-2xl font-semibold text-zinc-900">
             Create your account
           </h1>
-
-          <form action={signInWithGoogle}>
-            <button
-              type="submit"
-              className="mb-6 flex w-full items-center justify-center gap-2 rounded-full border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
-            >
-              Continue with Google
-            </button>
-          </form>
-
-          <div className="mb-6 flex items-center gap-3 text-xs text-zinc-400">
-            <div className="h-px flex-1 bg-zinc-200" />
-            OR
-            <div className="h-px flex-1 bg-zinc-200" />
-          </div>
 
           <form action={formAction} className="flex flex-col gap-4">
             <input

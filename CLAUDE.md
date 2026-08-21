@@ -27,7 +27,8 @@ Stop and confirm with Rex once this round-trip works end to end, verified with a
 
 1. Simple homepage (clean landing page, not fancy yet).
 2. Email/password signup and login via Supabase Auth.
-3. Google sign-in via Supabase's Google provider.
-4. Bare authenticated page after login (either method) — proof session persists.
-5. Real `/privacy` and `/terms` pages describing what this app actually collects (email, name, auth provider) — needed for Google's OAuth consent screen.
-6. One throwaway test account, credentials given to Rex, and used by Claude to verify the flow directly rather than assuming it works.
+3. Bare authenticated page after login — proof session persists.
+4. Real `/privacy` and `/terms` pages describing what this app actually collects (email, name).
+5. One throwaway test account, credentials given to Rex, and used by Claude to verify the flow directly rather than assuming it works.
+
+Google sign-in was deliberately skipped for this build (2026-08-22) — email/password only. Can be added later via Supabase's Google provider if needed.

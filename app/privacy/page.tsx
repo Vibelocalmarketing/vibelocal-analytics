@@ -20,10 +20,6 @@ export default function PrivacyPage() {
             <ul className="mt-2 list-disc pl-6">
               <li>Your email address</li>
               <li>Your name</li>
-              <li>
-                If you sign in with Google, basic profile information Google
-                shares with us (your name, email address, and profile picture)
-              </li>
             </ul>
           </section>
 
@@ -44,8 +40,7 @@ export default function PrivacyPage() {
             <p>
               Your account data is stored with Supabase, our database and
               authentication provider. Passwords are never stored in plain
-              text. If you sign in with Google, we never see or store your
-              Google password.
+              text.
             </p>
           </section>
 
