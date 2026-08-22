@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-const SCOPE = "https://www.googleapis.com/auth/analytics.readonly";
+const SCOPE =
+  "https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/userinfo.email";
 
 export async function GET() {
   const supabase = await createClient();
