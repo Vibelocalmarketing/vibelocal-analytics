@@ -3,10 +3,8 @@ import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4
 import {
   comparisonRange,
   defaultRangeFor,
-  dimensionForGranularity,
   formatRangeLabel,
   type CompareMode,
-  type Granularity,
 } from "@/lib/analytics/period";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
@@ -45,13 +43,11 @@ export default async function WholeSiteAnalyticsPage({
   const properties = await listProperties();
   const params = await searchParams;
 
-  const granularity = (params.granularity as Granularity) || "day";
   const propertyId = params.property || properties[0]?.propertyId;
-  const defaults = defaultRangeFor(granularity);
+  const defaults = defaultRangeFor("day");
   const start = params.start || defaults.start;
   const end = params.end || defaults.end;
   const compareMode = (params.compare as CompareMode) || "none";
-  const offset = Number(params.offset) || 1;
 
   if (!propertyId) {
     return (
@@ -63,22 +59,21 @@ export default async function WholeSiteAnalyticsPage({
     );
   }
 
-  const dimension = dimensionForGranularity[granularity];
   const currentReport = await runReport({
     propertyId,
     startDate: start,
     endDate: end,
-    dimensions: [dimension],
+    dimensions: [],
     metrics: ["activeUsers", "sessions"],
   });
 
-  const compareRange = comparisonRange(start, end, compareMode, offset);
+  const compareRange = comparisonRange(start, end, compareMode);
   const compareReport = compareRange
     ? await runReport({
         propertyId,
         startDate: compareRange.start,
         endDate: compareRange.end,
-        dimensions: [dimension],
+        dimensions: [],
         metrics: ["activeUsers", "sessions"],
       })
     : null;
@@ -138,20 +133,6 @@ export default async function WholeSiteAnalyticsPage({
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-500">Group by</label>
-          <select
-            name="granularity"
-            defaultValue={granularity}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
-          >
-            <option value="day">Day</option>
-            <option value="week">Week</option>
-            <option value="month">Month</option>
-            <option value="year">Year</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-slate-500">Compare to</label>
           <select
             name="compare"
@@ -159,20 +140,9 @@ export default async function WholeSiteAnalyticsPage({
             className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
           >
             <option value="none">No comparison</option>
-            <option value="previous">Previous period(s)</option>
+            <option value="previous">Previous period (same length)</option>
             <option value="yoy">Same period last year</option>
           </select>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-500">Periods back</label>
-          <input
-            type="number"
-            name="offset"
-            min={1}
-            defaultValue={offset}
-            className="w-20 rounded-lg border border-slate-200 px-3 py-2 text-sm"
-          />
         </div>
 
         <button
