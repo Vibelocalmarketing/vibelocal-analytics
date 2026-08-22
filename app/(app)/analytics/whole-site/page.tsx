@@ -1,4 +1,4 @@
-import { Users, MousePointerClick, Phone, CheckCircle2 } from "lucide-react";
+import { Users, MousePointerClick, Phone, CheckCircle2, Eye, UserPlus, ShoppingCart } from "lucide-react";
 import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4";
 import {
   comparisonRange,
@@ -6,7 +6,7 @@ import {
   formatRangeLabel,
   type CompareMode,
 } from "@/lib/analytics/period";
-import { sumByType, toEventRows } from "@/lib/analytics/events";
+import { sumByType, sumEventName, toEventRows } from "@/lib/analytics/events";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
 import { DateRangePresets } from "@/components/date-range-presets";
@@ -14,16 +14,26 @@ import { DateRangePresets } from "@/components/date-range-presets";
 function sumMetrics(report: { rows?: { metricValues?: { value: string }[] }[] } | undefined) {
   let users = 0;
   let sessions = 0;
+  let pageViews = 0;
   for (const row of report?.rows ?? []) {
     users += Number(row.metricValues?.[0]?.value ?? 0);
     sessions += Number(row.metricValues?.[1]?.value ?? 0);
+    pageViews += Number(row.metricValues?.[2]?.value ?? 0);
   }
-  return { users, sessions };
+  return { users, sessions, pageViews };
 }
 
 function deltaPct(current: number, previous: number): number | null {
   if (previous === 0) return null;
   return ((current - previous) / previous) * 100;
+}
+
+function statProps(current: number, compare: number | null, compareRangeLabel?: string) {
+  return {
+    deltaPct: compare !== null ? deltaPct(current, compare) : undefined,
+    compareValue: compare !== null ? compare.toLocaleString() : undefined,
+    compareRangeLabel,
+  };
 }
 
 export default async function WholeSiteAnalyticsPage({
@@ -65,7 +75,7 @@ export default async function WholeSiteAnalyticsPage({
     startDate: start,
     endDate: end,
     dimensions: [],
-    metrics: ["activeUsers", "sessions"],
+    metrics: ["activeUsers", "sessions", "screenPageViews"],
   });
 
   const currentEventsReport = await runReport({
@@ -83,7 +93,7 @@ export default async function WholeSiteAnalyticsPage({
         startDate: compareRange.start,
         endDate: compareRange.end,
         dimensions: [],
-        metrics: ["activeUsers", "sessions"],
+        metrics: ["activeUsers", "sessions", "screenPageViews"],
       })
     : null;
 
@@ -104,10 +114,14 @@ export default async function WholeSiteAnalyticsPage({
   const currentEvents = toEventRows(currentEventsReport);
   const phoneClicks = sumByType(currentEvents, "phone");
   const formSubmits = sumByType(currentEvents, "form_submit");
+  const addToCarts = sumEventName(currentEvents, "add_to_cart");
+  const firstVisits = sumEventName(currentEvents, "first_visit");
 
   const compareEvents = compareEventsReport ? toEventRows(compareEventsReport) : null;
   const comparePhoneClicks = compareEvents ? sumByType(compareEvents, "phone") : null;
   const compareFormSubmits = compareEvents ? sumByType(compareEvents, "form_submit") : null;
+  const compareAddToCarts = compareEvents ? sumEventName(compareEvents, "add_to_cart") : null;
+  const compareFirstVisits = compareEvents ? sumEventName(compareEvents, "first_visit") : null;
 
   return (
     <div className="flex flex-col gap-6 p-8">
@@ -185,39 +199,43 @@ export default async function WholeSiteAnalyticsPage({
           label="Users"
           value={currentTotals.users.toLocaleString()}
           icon={Users}
-          deltaPct={compareTotals ? deltaPct(currentTotals.users, compareTotals.users) : undefined}
-          compareValue={compareTotals ? compareTotals.users.toLocaleString() : undefined}
-          compareRangeLabel={compareRangeLabel}
+          {...statProps(currentTotals.users, compareTotals?.users ?? null, compareRangeLabel)}
         />
         <StatCard
           label="Sessions"
           value={currentTotals.sessions.toLocaleString()}
           icon={MousePointerClick}
-          deltaPct={
-            compareTotals ? deltaPct(currentTotals.sessions, compareTotals.sessions) : undefined
-          }
-          compareValue={compareTotals ? compareTotals.sessions.toLocaleString() : undefined}
-          compareRangeLabel={compareRangeLabel}
+          {...statProps(currentTotals.sessions, compareTotals?.sessions ?? null, compareRangeLabel)}
+        />
+        <StatCard
+          label="Page Views"
+          value={currentTotals.pageViews.toLocaleString()}
+          icon={Eye}
+          {...statProps(currentTotals.pageViews, compareTotals?.pageViews ?? null, compareRangeLabel)}
+        />
+        <StatCard
+          label="First Visits"
+          value={firstVisits.toLocaleString()}
+          icon={UserPlus}
+          {...statProps(firstVisits, compareFirstVisits, compareRangeLabel)}
         />
         <StatCard
           label="Phone Clicks"
           value={phoneClicks.toLocaleString()}
           icon={Phone}
-          deltaPct={
-            comparePhoneClicks !== null ? deltaPct(phoneClicks, comparePhoneClicks) : undefined
-          }
-          compareValue={comparePhoneClicks !== null ? comparePhoneClicks.toLocaleString() : undefined}
-          compareRangeLabel={compareRangeLabel}
+          {...statProps(phoneClicks, comparePhoneClicks, compareRangeLabel)}
         />
         <StatCard
           label="Form Submissions"
           value={formSubmits.toLocaleString()}
           icon={CheckCircle2}
-          deltaPct={
-            compareFormSubmits !== null ? deltaPct(formSubmits, compareFormSubmits) : undefined
-          }
-          compareValue={compareFormSubmits !== null ? compareFormSubmits.toLocaleString() : undefined}
-          compareRangeLabel={compareRangeLabel}
+          {...statProps(formSubmits, compareFormSubmits, compareRangeLabel)}
+        />
+        <StatCard
+          label="Add to Cart"
+          value={addToCarts.toLocaleString()}
+          icon={ShoppingCart}
+          {...statProps(addToCarts, compareAddToCarts, compareRangeLabel)}
         />
       </div>
     </div>

@@ -23,3 +23,7 @@ export function toEventRows(
 export function sumByType(events: EventRow[], type: EventType): number {
   return events.filter((e) => classifyEvent(e.eventName) === type).reduce((s, e) => s + e.count, 0);
 }
+
+export function sumEventName(events: EventRow[], eventName: string): number {
+  return events.filter((e) => e.eventName === eventName).reduce((s, e) => s + e.count, 0);
+}
