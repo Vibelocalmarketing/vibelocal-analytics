@@ -50,6 +50,13 @@ export function defaultRangeFor(granularity: Granularity): { start: string; end:
   return { start: formatDate(start), end: formatDate(end) };
 }
 
+export function formatRangeLabel(start: string, end: string): string {
+  const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric", year: "numeric" };
+  const s = parseDate(start).toLocaleDateString("en-US", opts);
+  const e = parseDate(end).toLocaleDateString("en-US", opts);
+  return start === end ? s : `${s} – ${e}`;
+}
+
 export type PresetUnit = "1d" | "7d" | "1m" | "1y";
 
 export function presetRange(unit: PresetUnit): { start: string; end: string } {

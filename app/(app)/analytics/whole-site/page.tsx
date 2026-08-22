@@ -4,6 +4,7 @@ import {
   comparisonRange,
   defaultRangeFor,
   dimensionForGranularity,
+  formatRangeLabel,
   type CompareMode,
   type Granularity,
 } from "@/lib/analytics/period";
@@ -84,6 +85,7 @@ export default async function WholeSiteAnalyticsPage({
 
   const currentTotals = sumMetrics(currentReport);
   const compareTotals = compareReport ? sumMetrics(compareReport) : null;
+  const compareRangeLabel = compareRange ? formatRangeLabel(compareRange.start, compareRange.end) : undefined;
 
   return (
     <div className="flex flex-col gap-6 p-8">
@@ -187,6 +189,8 @@ export default async function WholeSiteAnalyticsPage({
           value={currentTotals.users.toLocaleString()}
           icon={Users}
           deltaPct={compareTotals ? deltaPct(currentTotals.users, compareTotals.users) : undefined}
+          compareValue={compareTotals ? compareTotals.users.toLocaleString() : undefined}
+          compareRangeLabel={compareRangeLabel}
         />
         <StatCard
           label="Sessions"
@@ -195,6 +199,8 @@ export default async function WholeSiteAnalyticsPage({
           deltaPct={
             compareTotals ? deltaPct(currentTotals.sessions, compareTotals.sessions) : undefined
           }
+          compareValue={compareTotals ? compareTotals.sessions.toLocaleString() : undefined}
+          compareRangeLabel={compareRangeLabel}
         />
       </div>
 

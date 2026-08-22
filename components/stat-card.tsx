@@ -5,12 +5,17 @@ export function StatCard({
   value,
   icon: Icon,
   deltaPct,
+  compareValue,
+  compareRangeLabel,
 }: {
   label: string;
   value: string;
   icon: LucideIcon;
   deltaPct?: number | null;
+  compareValue?: string;
+  compareRangeLabel?: string;
 }) {
+  const hasDelta = deltaPct !== undefined && deltaPct !== null;
   const positive = (deltaPct ?? 0) >= 0;
 
   return (
@@ -24,14 +29,22 @@ export function StatCard({
       <div className="bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text text-3xl font-semibold text-transparent">
         {value}
       </div>
-      {deltaPct !== undefined && deltaPct !== null && (
-        <div
-          className={`mt-2 flex items-center gap-1 text-sm font-medium ${
-            positive ? "text-emerald-600" : "text-red-600"
-          }`}
-        >
-          {positive ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />}
-          {Math.abs(deltaPct).toFixed(1)}% vs comparison period
+      {compareValue !== undefined && (
+        <div className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm">
+          {hasDelta && (
+            <span
+              className={`flex items-center gap-1 font-medium ${
+                positive ? "text-emerald-600" : "text-red-600"
+              }`}
+            >
+              {positive ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />}
+              {Math.abs(deltaPct!).toFixed(1)}%
+            </span>
+          )}
+          <span className="text-slate-400">
+            vs {compareValue}
+            {compareRangeLabel ? ` (${compareRangeLabel})` : ""}
+          </span>
         </div>
       )}
     </div>
