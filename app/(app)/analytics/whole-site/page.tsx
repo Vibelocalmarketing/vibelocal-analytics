@@ -9,6 +9,7 @@ import {
 } from "@/lib/analytics/period";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
+import { DateRangePresets } from "@/components/date-range-presets";
 
 function sumMetrics(report: { rows?: { metricValues?: { value: string }[] }[] } | undefined) {
   let users = 0;
@@ -92,6 +93,8 @@ export default async function WholeSiteAnalyticsPage({
           Connected as {connection.google_email}
         </p>
       </div>
+
+      <DateRangePresets pathname="/analytics/whole-site" currentParams={params} />
 
       <form
         method="get"

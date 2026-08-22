@@ -50,6 +50,27 @@ export function defaultRangeFor(granularity: Granularity): { start: string; end:
   return { start: formatDate(start), end: formatDate(end) };
 }
 
+export type PresetUnit = "1d" | "7d" | "1m" | "1y";
+
+export function presetRange(unit: PresetUnit): { start: string; end: string } {
+  const end = new Date();
+  const start = new Date(end);
+  switch (unit) {
+    case "1d":
+      break;
+    case "7d":
+      start.setUTCDate(start.getUTCDate() - 6);
+      break;
+    case "1m":
+      start.setUTCMonth(start.getUTCMonth() - 1);
+      break;
+    case "1y":
+      start.setUTCFullYear(start.getUTCFullYear() - 1);
+      break;
+  }
+  return { start: formatDate(start), end: formatDate(end) };
+}
+
 export const dimensionForGranularity: Record<Granularity, string> = {
   day: "date",
   week: "yearWeek",

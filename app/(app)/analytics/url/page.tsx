@@ -3,6 +3,7 @@ import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4
 import { defaultRangeFor } from "@/lib/analytics/period";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
+import { DateRangePresets } from "@/components/date-range-presets";
 
 type EventRow = { eventName: string; count: number };
 
@@ -94,6 +95,8 @@ export default async function UrlAnalyticsPage({
         <h1 className="text-2xl font-semibold text-slate-900">URL Analytics</h1>
         <p className="text-sm text-slate-500">Connected as {connection.google_email}</p>
       </div>
+
+      <DateRangePresets pathname="/analytics/url" currentParams={params} />
 
       <form
         method="get"
