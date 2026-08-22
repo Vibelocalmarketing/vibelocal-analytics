@@ -10,7 +10,7 @@ import { sumByType, sumEventName, toEventRows } from "@/lib/analytics/events";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
 import { DateRangePresets } from "@/components/date-range-presets";
-import { TrackingAlert } from "@/components/tracking-alert";
+import { TrackingAlertIcon } from "@/components/tracking-alert-icon";
 
 function sumMetrics(report: { rows?: { metricValues?: { value: string }[] }[] } | undefined) {
   let users = 0;
@@ -149,7 +149,10 @@ export default async function WholeSiteAnalyticsPage({
   return (
     <div className="flex flex-col gap-6 p-8">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Whole Site Analytics</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-semibold text-slate-900">Whole Site Analytics</h1>
+          <TrackingAlertIcon messages={alerts} />
+        </div>
         <p className="text-sm text-slate-500">
           Connected as {connection.google_email}
         </p>
@@ -218,8 +221,6 @@ export default async function WholeSiteAnalyticsPage({
           Update
         </button>
       </form>
-
-      <TrackingAlert messages={alerts} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
