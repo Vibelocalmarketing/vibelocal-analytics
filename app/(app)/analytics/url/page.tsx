@@ -1,19 +1,10 @@
 import { Eye, MousePointerClick, Phone, FileText, CheckCircle2 } from "lucide-react";
 import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4";
 import { defaultRangeFor } from "@/lib/analytics/period";
+import { classifyEvent, sumByType, toEventRows, type EventRow } from "@/lib/analytics/events";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
 import { DateRangePresets } from "@/components/date-range-presets";
-
-type EventRow = { eventName: string; count: number };
-
-function classify(eventName: string): "phone" | "form_start" | "form_submit" | "other" {
-  const n = eventName.toLowerCase();
-  if (n.includes("phone") || n.includes("call")) return "phone";
-  if (n.includes("form") && n.includes("start")) return "form_start";
-  if (n.includes("form") && (n.includes("submit") || n.includes("complete"))) return "form_submit";
-  return "other";
-}
 
 export default async function UrlAnalyticsPage({
   searchParams,
@@ -75,19 +66,13 @@ export default async function UrlAnalyticsPage({
       dimensionFilter: pathFilter,
     });
 
-    events = (eventsReport.rows ?? [])
-      .map((row: { dimensionValues?: { value: string }[]; metricValues?: { value: string }[] }) => ({
-        eventName: row.dimensionValues?.[0]?.value ?? "",
-        count: Number(row.metricValues?.[0]?.value ?? 0),
-      }))
-      .filter((e: EventRow) => e.eventName !== "page_view")
-      .sort((a: EventRow, b: EventRow) => b.count - a.count);
+    events = toEventRows(eventsReport).sort((a: EventRow, b: EventRow) => b.count - a.count);
   }
 
-  const phoneClicks = events.filter((e) => classify(e.eventName) === "phone").reduce((s, e) => s + e.count, 0);
-  const formStarts = events.filter((e) => classify(e.eventName) === "form_start").reduce((s, e) => s + e.count, 0);
-  const formSubmits = events.filter((e) => classify(e.eventName) === "form_submit").reduce((s, e) => s + e.count, 0);
-  const buttonClicks = events.filter((e) => classify(e.eventName) === "other");
+  const phoneClicks = sumByType(events, "phone");
+  const formStarts = sumByType(events, "form_start");
+  const formSubmits = sumByType(events, "form_submit");
+  const buttonClicks = events.filter((e) => classifyEvent(e.eventName) === "other");
 
   return (
     <div className="flex flex-col gap-6 p-8">

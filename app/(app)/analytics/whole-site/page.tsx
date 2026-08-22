@@ -1,4 +1,4 @@
-import { Users, MousePointerClick } from "lucide-react";
+import { Users, MousePointerClick, Phone, CheckCircle2 } from "lucide-react";
 import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4";
 import {
   comparisonRange,
@@ -6,6 +6,7 @@ import {
   formatRangeLabel,
   type CompareMode,
 } from "@/lib/analytics/period";
+import { sumByType, toEventRows } from "@/lib/analytics/events";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
 import { DateRangePresets } from "@/components/date-range-presets";
@@ -67,6 +68,14 @@ export default async function WholeSiteAnalyticsPage({
     metrics: ["activeUsers", "sessions"],
   });
 
+  const currentEventsReport = await runReport({
+    propertyId,
+    startDate: start,
+    endDate: end,
+    dimensions: ["eventName"],
+    metrics: ["eventCount"],
+  });
+
   const compareRange = comparisonRange(start, end, compareMode);
   const compareReport = compareRange
     ? await runReport({
@@ -78,9 +87,27 @@ export default async function WholeSiteAnalyticsPage({
       })
     : null;
 
+  const compareEventsReport = compareRange
+    ? await runReport({
+        propertyId,
+        startDate: compareRange.start,
+        endDate: compareRange.end,
+        dimensions: ["eventName"],
+        metrics: ["eventCount"],
+      })
+    : null;
+
   const currentTotals = sumMetrics(currentReport);
   const compareTotals = compareReport ? sumMetrics(compareReport) : null;
   const compareRangeLabel = compareRange ? formatRangeLabel(compareRange.start, compareRange.end) : undefined;
+
+  const currentEvents = toEventRows(currentEventsReport);
+  const phoneClicks = sumByType(currentEvents, "phone");
+  const formSubmits = sumByType(currentEvents, "form_submit");
+
+  const compareEvents = compareEventsReport ? toEventRows(compareEventsReport) : null;
+  const comparePhoneClicks = compareEvents ? sumByType(compareEvents, "phone") : null;
+  const compareFormSubmits = compareEvents ? sumByType(compareEvents, "form_submit") : null;
 
   return (
     <div className="flex flex-col gap-6 p-8">
@@ -153,7 +180,7 @@ export default async function WholeSiteAnalyticsPage({
         </button>
       </form>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Users"
           value={currentTotals.users.toLocaleString()}
@@ -172,8 +199,27 @@ export default async function WholeSiteAnalyticsPage({
           compareValue={compareTotals ? compareTotals.sessions.toLocaleString() : undefined}
           compareRangeLabel={compareRangeLabel}
         />
+        <StatCard
+          label="Phone Clicks"
+          value={phoneClicks.toLocaleString()}
+          icon={Phone}
+          deltaPct={
+            comparePhoneClicks !== null ? deltaPct(phoneClicks, comparePhoneClicks) : undefined
+          }
+          compareValue={comparePhoneClicks !== null ? comparePhoneClicks.toLocaleString() : undefined}
+          compareRangeLabel={compareRangeLabel}
+        />
+        <StatCard
+          label="Form Submissions"
+          value={formSubmits.toLocaleString()}
+          icon={CheckCircle2}
+          deltaPct={
+            compareFormSubmits !== null ? deltaPct(formSubmits, compareFormSubmits) : undefined
+          }
+          compareValue={compareFormSubmits !== null ? compareFormSubmits.toLocaleString() : undefined}
+          compareRangeLabel={compareRangeLabel}
+        />
       </div>
-
     </div>
   );
 }
