@@ -10,8 +10,6 @@ import {
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
 
-type Row = { bucket: string; users: number; sessions: number };
-
 function sumMetrics(report: { rows?: { metricValues?: { value: string }[] }[] } | undefined) {
   let users = 0;
   let sessions = 0;
@@ -20,18 +18,6 @@ function sumMetrics(report: { rows?: { metricValues?: { value: string }[] }[] } 
     sessions += Number(row.metricValues?.[1]?.value ?? 0);
   }
   return { users, sessions };
-}
-
-function toRows(
-  report: { rows?: { dimensionValues?: { value: string }[]; metricValues?: { value: string }[] }[] } | undefined,
-): Row[] {
-  return (report?.rows ?? [])
-    .map((row) => ({
-      bucket: row.dimensionValues?.[0]?.value ?? "",
-      users: Number(row.metricValues?.[0]?.value ?? 0),
-      sessions: Number(row.metricValues?.[1]?.value ?? 0),
-    }))
-    .sort((a, b) => a.bucket.localeCompare(b.bucket));
 }
 
 function deltaPct(current: number, previous: number): number | null {
@@ -95,7 +81,6 @@ export default async function WholeSiteAnalyticsPage({
       })
     : null;
 
-  const rows = toRows(currentReport);
   const currentTotals = sumMetrics(currentReport);
   const compareTotals = compareReport ? sumMetrics(compareReport) : null;
 
@@ -210,33 +195,6 @@ export default async function WholeSiteAnalyticsPage({
         />
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <th className="px-5 py-3">{granularity}</th>
-              <th className="px-5 py-3">Users</th>
-              <th className="px-5 py-3">Sessions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.bucket} className="border-b border-slate-100 last:border-0">
-                <td className="px-5 py-3 text-slate-700">{row.bucket}</td>
-                <td className="px-5 py-3 text-slate-700">{row.users.toLocaleString()}</td>
-                <td className="px-5 py-3 text-slate-700">{row.sessions.toLocaleString()}</td>
-              </tr>
-            ))}
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={3} className="px-5 py-8 text-center text-slate-400">
-                  No data for this range.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }
