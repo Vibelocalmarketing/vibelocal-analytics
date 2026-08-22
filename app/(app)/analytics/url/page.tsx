@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4";
 import { comparisonRange, defaultRangeFor, formatRangeLabel, type CompareMode } from "@/lib/analytics/period";
-import { classifyEvent, sumByType, sumEventName, toEventRows, type EventRow } from "@/lib/analytics/events";
+import { sumByType, sumEventName, toEventRows, type EventRow } from "@/lib/analytics/events";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
 import { DateRangePresets } from "@/components/date-range-presets";
@@ -133,7 +133,6 @@ export default async function UrlAnalyticsPage({
   const formSubmits = sumByType(events, "form_submit");
   const addToCarts = sumEventName(events, "add_to_cart");
   const firstVisits = sumEventName(events, "first_visit");
-  const buttonClicks = events.filter((e) => classifyEvent(e.eventName) === "other");
 
   const comparePhoneClicks = compareEvents ? sumByType(compareEvents, "phone") : null;
   const compareFormStarts = compareEvents ? sumByType(compareEvents, "form_start") : null;
@@ -274,39 +273,6 @@ export default async function UrlAnalyticsPage({
               icon={ShoppingCart}
               {...statProps(addToCarts, compareAddToCarts, compareRangeLabel)}
             />
-          </div>
-
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="border-b border-slate-200 px-5 py-3">
-              <h2 className="text-sm font-semibold text-slate-900">Button clicks &amp; other events</h2>
-              <p className="text-xs text-slate-400">
-                Every other event fired on this page, by name — including named button clicks, if your
-                site&apos;s GA4 setup tracks them.
-              </p>
-            </div>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  <th className="px-5 py-3">Event name</th>
-                  <th className="px-5 py-3">Count</th>
-                </tr>
-              </thead>
-              <tbody>
-                {buttonClicks.map((e) => (
-                  <tr key={e.eventName} className="border-b border-slate-100 last:border-0">
-                    <td className="px-5 py-3 text-slate-700">{e.eventName}</td>
-                    <td className="px-5 py-3 text-slate-700">{e.count.toLocaleString()}</td>
-                  </tr>
-                ))}
-                {buttonClicks.length === 0 && (
-                  <tr>
-                    <td colSpan={2} className="px-5 py-8 text-center text-slate-400">
-                      No other events tracked on this page.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
           </div>
         </>
       )}
