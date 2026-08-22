@@ -41,7 +41,7 @@ export function StatCard({
               {Math.abs(deltaPct!).toFixed(1)}%
             </span>
           )}
-          <span className="text-slate-400">
+          <span className="font-semibold text-slate-600">
             vs {compareValue}
             {compareRangeLabel ? ` (${compareRangeLabel})` : ""}
           </span>
