@@ -10,6 +10,7 @@ import { sumByType, sumEventName, toEventRows } from "@/lib/analytics/events";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
 import { DateRangePresets } from "@/components/date-range-presets";
+import { TrackingAlert } from "@/components/tracking-alert";
 
 function sumMetrics(report: { rows?: { metricValues?: { value: string }[] }[] } | undefined) {
   let users = 0;
@@ -123,6 +124,28 @@ export default async function WholeSiteAnalyticsPage({
   const compareAddToCarts = compareEvents ? sumEventName(compareEvents, "add_to_cart") : null;
   const compareFirstVisits = compareEvents ? sumEventName(compareEvents, "first_visit") : null;
 
+  const alerts: string[] = [];
+  if (currentTotals.sessions === 0) {
+    alerts.push(
+      "No traffic recorded at all in this date range. If that seems wrong, double-check that Google Analytics is still installed and firing on this site.",
+    );
+  } else if (phoneClicks === 0 && formSubmits === 0) {
+    alerts.push(
+      "No phone clicks or form submissions recorded in this range, even though there's traffic. If this site has a phone number or contact form, it's worth checking that click/submit tracking is still wired up correctly.",
+    );
+  } else {
+    if (phoneClicks === 0) {
+      alerts.push(
+        "No phone clicks recorded in this range. If this site has a clickable phone number, check that its click tracking is still firing.",
+      );
+    }
+    if (formSubmits === 0) {
+      alerts.push(
+        "No form submissions recorded in this range. If this site has a lead form, check that its submit tracking is still firing.",
+      );
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6 p-8">
       <div>
@@ -195,6 +218,8 @@ export default async function WholeSiteAnalyticsPage({
           Update
         </button>
       </form>
+
+      <TrackingAlert messages={alerts} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard

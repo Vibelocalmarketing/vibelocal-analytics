@@ -14,6 +14,7 @@ import { sumByType, sumEventName, toEventRows, type EventRow } from "@/lib/analy
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
 import { DateRangePresets } from "@/components/date-range-presets";
+import { TrackingAlert } from "@/components/tracking-alert";
 
 function sumTraffic(report: { rows?: { metricValues?: { value: string }[] }[] } | undefined) {
   let users = 0;
@@ -140,6 +141,30 @@ export default async function UrlAnalyticsPage({
   const compareAddToCarts = compareEvents ? sumEventName(compareEvents, "add_to_cart") : null;
   const compareFirstVisits = compareEvents ? sumEventName(compareEvents, "first_visit") : null;
 
+  const alerts: string[] = [];
+  if (hasQuery) {
+    if (currentTotals.sessions === 0) {
+      alerts.push(
+        "No traffic recorded for this page path in this date range. If that seems wrong, double-check the path is correct and that Google Analytics is still firing on this page.",
+      );
+    } else if (phoneClicks === 0 && formStarts === 0 && formSubmits === 0) {
+      alerts.push(
+        "No phone clicks, form starts, or form submissions recorded for this page, even though there's traffic. If this page has a phone number or contact form, it's worth checking that tracking is still wired up correctly.",
+      );
+    } else {
+      if (phoneClicks === 0) {
+        alerts.push(
+          "No phone clicks recorded for this page. If it has a clickable phone number, check that its click tracking is still firing.",
+        );
+      }
+      if (formSubmits === 0) {
+        alerts.push(
+          "No form submissions recorded for this page. If it has a lead form, check that its submit tracking is still firing.",
+        );
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6 p-8">
       <div>
@@ -226,6 +251,8 @@ export default async function UrlAnalyticsPage({
         <p className="text-sm text-slate-400">Enter a page path above to see its analytics.</p>
       ) : (
         <>
+          <TrackingAlert messages={alerts} />
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               label="Users"
