@@ -5,10 +5,29 @@ change to a table gets recorded here at the time it's made.
 
 ## Tables
 
-No custom tables yet. Auth is fully handled by Supabase's built-in `auth.users`
-table (email/password + Google OAuth), which we don't manage directly.
+### `ga4_connection`
 
-When the first app table is added:
+Stores the single Google OAuth connection used to pull Google Analytics (GA4)
+data. Single-tenant app (Rex's own client sites), so this is expected to hold
+at most one row at a time — connecting again overwrites the previous row.
+
+```sql
+create table ga4_connection (
+  id uuid primary key default gen_random_uuid(),
+  google_email text not null,
+  refresh_token text not null,
+  connected_at timestamptz not null default now()
+);
+
+revoke all on ga4_connection from anon, authenticated;
+alter table ga4_connection enable row level security;
+-- No policies: service-role client only, never read from the browser.
+```
+
+No foreign key to `auth.users`, so nothing to add to `lib/auth/delete-account.ts`.
+
+## Adding the next table
+
 - Record its purpose, columns, and RLS policy here with the exact SQL.
 - Default: `revoke all on <table> from anon, authenticated`, RLS enabled,
   service-role client only — unless a user genuinely needs to read their own
