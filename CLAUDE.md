@@ -33,6 +33,8 @@ Stop and confirm with Rex once this round-trip works end to end, verified with a
 
 Google sign-in was deliberately skipped for this build (2026-08-22) — email/password only. Can be added later via Supabase's Google provider if needed.
 
+Email confirmation on signup was turned off (2026-08-22) — Supabase's default email sender has a strict rate limit unsuited even to testing, and no custom SMTP is configured yet. Acceptable for now since this is internal-only (company use, not public), but note: since GA4/Ads connections are stored as one global row (not per-user), anyone who signs up — with any email, verified or not — sees the same connected analytics data. Revisit if this app is ever opened to outside users: re-enable confirmation and/or set up a real email provider (e.g. Resend) first.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
