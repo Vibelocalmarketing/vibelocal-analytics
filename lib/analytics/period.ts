@@ -90,7 +90,6 @@ export type CompareMode = "none" | "previous" | "yoy";
 export function comparisonRange(
   start: string,
   end: string,
-  granularity: Granularity,
   mode: CompareMode,
   offset: number,
 ): { start: string; end: string } | null {
@@ -103,8 +102,17 @@ export function comparisonRange(
     };
   }
 
+  // "Previous period(s)" always shifts back by the length of the currently
+  // selected range itself — not by "Group by" — so 1 period back means
+  // "the period immediately before this one, same length," regardless of
+  // what Group by is set to.
+  const startDate = parseDate(start);
+  const endDate = parseDate(end);
+  const spanDays = Math.round((endDate.getTime() - startDate.getTime()) / 86400000) + 1;
+  const shiftDays = spanDays * offset;
+
   return {
-    start: formatDate(shiftDate(parseDate(start), granularity, offset)),
-    end: formatDate(shiftDate(parseDate(end), granularity, offset)),
+    start: formatDate(shiftDate(startDate, "day", shiftDays)),
+    end: formatDate(shiftDate(endDate, "day", shiftDays)),
   };
 }

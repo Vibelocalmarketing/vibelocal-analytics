@@ -72,7 +72,7 @@ export default async function WholeSiteAnalyticsPage({
     metrics: ["activeUsers", "sessions"],
   });
 
-  const compareRange = comparisonRange(start, end, granularity, compareMode, offset);
+  const compareRange = comparisonRange(start, end, compareMode, offset);
   const compareReport = compareRange
     ? await runReport({
         propertyId,
