@@ -182,6 +182,7 @@ export default async function UrlAnalyticsPage({
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-slate-500">From</label>
           <input
+            key={start}
             type="date"
             name="start"
             defaultValue={start}
@@ -192,6 +193,7 @@ export default async function UrlAnalyticsPage({
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-slate-500">To</label>
           <input
+            key={end}
             type="date"
             name="end"
             defaultValue={end}
