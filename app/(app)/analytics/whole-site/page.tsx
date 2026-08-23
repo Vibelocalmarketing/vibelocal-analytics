@@ -1,4 +1,4 @@
-import { Users, MousePointerClick, Phone, CheckCircle2, Eye, UserPlus, ShoppingCart } from "lucide-react";
+import { Users, MousePointerClick, Phone, CheckCircle2, Eye, UserPlus, ShoppingCart, Megaphone } from "lucide-react";
 import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4";
 import {
   comparisonRange,
@@ -23,6 +23,25 @@ function sumMetrics(report: { rows?: { metricValues?: { value: string }[] }[] } 
   }
   return { users, sessions, pageViews };
 }
+
+function sumSingleMetric(report: { rows?: { metricValues?: { value: string }[] }[] } | undefined): number {
+  let total = 0;
+  for (const row of report?.rows ?? []) {
+    total += Number(row.metricValues?.[0]?.value ?? 0);
+  }
+  return total;
+}
+
+// Matches GA4's auto-tagging for actual Google Ads clicks (source=google,
+// medium=cpc) — distinct from organic Google search (medium=organic).
+const googleAdsFilter = {
+  andGroup: {
+    expressions: [
+      { filter: { fieldName: "sessionSource", stringFilter: { matchType: "EXACT", value: "google" } } },
+      { filter: { fieldName: "sessionMedium", stringFilter: { matchType: "EXACT", value: "cpc" } } },
+    ],
+  },
+};
 
 function deltaPct(current: number, previous: number): number | null {
   if (previous === 0) return null;
@@ -87,6 +106,15 @@ export default async function WholeSiteAnalyticsPage({
     metrics: ["eventCount"],
   });
 
+  const googleAdsReport = await runReport({
+    propertyId,
+    startDate: start,
+    endDate: end,
+    dimensions: [],
+    metrics: ["sessions"],
+    dimensionFilter: googleAdsFilter,
+  });
+
   const compareRange = comparisonRange(start, end, compareMode);
   const compareReport = compareRange
     ? await runReport({
@@ -108,9 +136,23 @@ export default async function WholeSiteAnalyticsPage({
       })
     : null;
 
+  const compareGoogleAdsReport = compareRange
+    ? await runReport({
+        propertyId,
+        startDate: compareRange.start,
+        endDate: compareRange.end,
+        dimensions: [],
+        metrics: ["sessions"],
+        dimensionFilter: googleAdsFilter,
+      })
+    : null;
+
   const currentTotals = sumMetrics(currentReport);
   const compareTotals = compareReport ? sumMetrics(compareReport) : null;
   const compareRangeLabel = compareRange ? formatRangeLabel(compareRange.start, compareRange.end) : undefined;
+
+  const googleAdsVisits = sumSingleMetric(googleAdsReport);
+  const compareGoogleAdsVisits = compareGoogleAdsReport ? sumSingleMetric(compareGoogleAdsReport) : null;
 
   const currentEvents = toEventRows(currentEventsReport);
   const phoneClicks = sumByType(currentEvents, "phone");
@@ -264,6 +306,12 @@ export default async function WholeSiteAnalyticsPage({
           value={addToCarts.toLocaleString()}
           icon={ShoppingCart}
           {...statProps(addToCarts, compareAddToCarts, compareRangeLabel)}
+        />
+        <StatCard
+          label="Google Ads Visits"
+          value={googleAdsVisits.toLocaleString()}
+          icon={Megaphone}
+          {...statProps(googleAdsVisits, compareGoogleAdsVisits, compareRangeLabel)}
         />
       </div>
     </div>

@@ -7,6 +7,7 @@ import {
   FileText,
   CheckCircle2,
   ShoppingCart,
+  Megaphone,
 } from "lucide-react";
 import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4";
 import { comparisonRange, defaultRangeFor, formatRangeLabel, type CompareMode } from "@/lib/analytics/period";
@@ -26,6 +27,14 @@ function sumTraffic(report: { rows?: { metricValues?: { value: string }[] }[] } 
     pageViews += Number(row.metricValues?.[2]?.value ?? 0);
   }
   return { users, sessions, pageViews };
+}
+
+function sumSingleMetric(report: { rows?: { metricValues?: { value: string }[] }[] } | undefined): number {
+  let total = 0;
+  for (const row of report?.rows ?? []) {
+    total += Number(row.metricValues?.[0]?.value ?? 0);
+  }
+  return total;
 }
 
 function deltaPct(current: number, previous: number): number | null {
@@ -72,6 +81,8 @@ export default async function UrlAnalyticsPage({
   let events: EventRow[] = [];
   let compareEvents: EventRow[] | null = null;
   let compareRangeLabel: string | undefined;
+  let googleAdsVisits = 0;
+  let compareGoogleAdsVisits: number | null = null;
 
   if (hasQuery) {
     const pathFilter = {
@@ -80,6 +91,18 @@ export default async function UrlAnalyticsPage({
         // "/" means "homepage only" and must match exactly — CONTAINS would
         // match every path on the site, since they all start with "/".
         stringFilter: { matchType: path === "/" ? "EXACT" : "CONTAINS", value: path },
+      },
+    };
+
+    // Matches GA4's auto-tagging for actual Google Ads clicks (source=google,
+    // medium=cpc) on this page — distinct from organic Google search.
+    const pathGoogleAdsFilter = {
+      andGroup: {
+        expressions: [
+          pathFilter,
+          { filter: { fieldName: "sessionSource", stringFilter: { matchType: "EXACT", value: "google" } } },
+          { filter: { fieldName: "sessionMedium", stringFilter: { matchType: "EXACT", value: "cpc" } } },
+        ],
       },
     };
 
@@ -101,8 +124,18 @@ export default async function UrlAnalyticsPage({
       dimensionFilter: pathFilter,
     });
 
+    const googleAdsReport = await runReport({
+      propertyId: propertyId!,
+      startDate: start,
+      endDate: end,
+      dimensions: [],
+      metrics: ["sessions"],
+      dimensionFilter: pathGoogleAdsFilter,
+    });
+
     currentTotals = sumTraffic(trafficReport);
     events = toEventRows(eventsReport).sort((a, b) => b.count - a.count);
+    googleAdsVisits = sumSingleMetric(googleAdsReport);
 
     const compareRange = comparisonRange(start, end, compareMode);
     if (compareRange) {
@@ -126,8 +159,18 @@ export default async function UrlAnalyticsPage({
         dimensionFilter: pathFilter,
       });
 
+      const compareGoogleAdsReport = await runReport({
+        propertyId: propertyId!,
+        startDate: compareRange.start,
+        endDate: compareRange.end,
+        dimensions: [],
+        metrics: ["sessions"],
+        dimensionFilter: pathGoogleAdsFilter,
+      });
+
       compareTotals = sumTraffic(compareTrafficReport);
       compareEvents = toEventRows(compareEventsReport);
+      compareGoogleAdsVisits = sumSingleMetric(compareGoogleAdsReport);
     }
   }
 
@@ -304,6 +347,12 @@ export default async function UrlAnalyticsPage({
               value={addToCarts.toLocaleString()}
               icon={ShoppingCart}
               {...statProps(addToCarts, compareAddToCarts, compareRangeLabel)}
+            />
+            <StatCard
+              label="Google Ads Visits"
+              value={googleAdsVisits.toLocaleString()}
+              icon={Megaphone}
+              {...statProps(googleAdsVisits, compareGoogleAdsVisits, compareRangeLabel)}
             />
           </div>
         </>
