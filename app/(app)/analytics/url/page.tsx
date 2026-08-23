@@ -62,7 +62,7 @@ export default async function UrlAnalyticsPage({
   const defaults = defaultRangeFor("day");
   const start = params.start || defaults.start;
   const end = params.end || defaults.end;
-  const path = params.path || "";
+  const path = params.path || "/";
   const compareMode = (params.compare as CompareMode) || "none";
 
   const hasQuery = Boolean(propertyId && path);
@@ -77,7 +77,9 @@ export default async function UrlAnalyticsPage({
     const pathFilter = {
       filter: {
         fieldName: "pagePath",
-        stringFilter: { matchType: "CONTAINS", value: path },
+        // "/" means "homepage only" and must match exactly — CONTAINS would
+        // match every path on the site, since they all start with "/".
+        stringFilter: { matchType: path === "/" ? "EXACT" : "CONTAINS", value: path },
       },
     };
 
