@@ -20,6 +20,7 @@ Next.js (App Router, TypeScript, Tailwind), hosted on Vercel. Database + auth on
 - When fixing one instance of a pattern, grep for every other instance and fix them all in the same commit.
 - After pushing, "live" means the Vercel deployment succeeded, not that the local build passed. Check the Deployments tab if something doesn't show up — don't assume it's just caching.
 - Keep a running table of env vars in the docs — name, purpose, and whether it's been added to Vercel yet — updated in the same commit that introduces a new one.
+- All app data is shared across every account, always — no per-user scoping, ever. This app has multiple people logging in (e.g. rex@vibelocalmarketing.com and others), but there's one shared dataset: one GA4 connection, one Integration Status checklist, one set of notes, etc. New tables should never key data by `user_id` or filter by "the current user" — every account sees and can change the same rows.
 
 ## First build target (skeleton)
 
