@@ -31,6 +31,9 @@ No foreign key to `auth.users`, so nothing to add to `lib/auth/delete-account.ts
 One row per GA4 property (`property_id`), tracking Rex's manual "have I
 verified this metric fires correctly" checklist for the Integration Status
 page. Purely a personal checklist — not derived from real tracking data.
+Also holds `hidden` (eye-icon toggle, for archiving inactive sites off the
+table) and `sort_order` (up/down arrow reordering; `null` means "not yet
+reordered, fall back to GA4's natural property order").
 
 ```sql
 create table integration_checklist (
@@ -49,6 +52,9 @@ create table integration_checklist (
 revoke all on integration_checklist from anon, authenticated;
 alter table integration_checklist enable row level security;
 -- No policies: service-role client only, never read from the browser.
+
+alter table integration_checklist add column hidden boolean not null default false;
+alter table integration_checklist add column sort_order integer;
 ```
 
 No foreign key to `auth.users`, so nothing to add to `lib/auth/delete-account.ts`.

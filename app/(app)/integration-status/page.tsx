@@ -8,11 +8,19 @@ import {
   ShoppingCart,
   Megaphone,
 } from "lucide-react";
+import Link from "next/link";
 import { getStoredConnection, listProperties } from "@/lib/google/ga4";
-import { getChecklist, getAllNotes, CHECKLIST_COLUMNS, type ChecklistColumn } from "@/lib/integration/db";
+import {
+  getChecklist,
+  getAllNotes,
+  orderPropertyIds,
+  CHECKLIST_COLUMNS,
+  type ChecklistColumn,
+} from "@/lib/integration/db";
 import { saveChecklist } from "@/lib/integration/actions";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { IntegrationNotesPopover } from "@/components/integration-notes-popover";
+import { IntegrationRowControls } from "@/components/integration-row-controls";
 
 const COLUMN_META: Record<ChecklistColumn, { label: string; icon: typeof Users }> = {
   users: { label: "Users", icon: Users },
@@ -25,7 +33,11 @@ const COLUMN_META: Record<ChecklistColumn, { label: string; icon: typeof Users }
   google_ads_clicks: { label: "Google Ads Clicks", icon: Megaphone },
 };
 
-export default async function IntegrationStatusPage() {
+export default async function IntegrationStatusPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ showHidden?: string }>;
+}) {
   const connection = await getStoredConnection();
 
   if (!connection) {
@@ -36,14 +48,25 @@ export default async function IntegrationStatusPage() {
     );
   }
 
-  const [properties, checklist, notesByProperty] = await Promise.all([
+  const { showHidden } = await searchParams;
+
+  const [allProperties, checklist, notesByProperty] = await Promise.all([
     listProperties(),
     getChecklist(),
     getAllNotes(),
   ]);
 
-  const propertyIds = properties.map((p) => p.propertyId);
-  const saveWithIds = saveChecklist.bind(null, propertyIds);
+  const allPropertyIds = allProperties.map((p) => p.propertyId);
+  const orderedIds = orderPropertyIds(allPropertyIds, checklist);
+  const byId = new Map(allProperties.map((p) => [p.propertyId, p]));
+
+  const orderedProperties = orderedIds.map((id) => byId.get(id)!);
+  const hiddenCount = orderedProperties.filter((p) => checklist.get(p.propertyId)?.hidden).length;
+  const properties = showHidden
+    ? orderedProperties
+    : orderedProperties.filter((p) => !checklist.get(p.propertyId)?.hidden);
+
+  const saveWithIds = saveChecklist.bind(null, allPropertyIds);
 
   return (
     <div className="flex flex-col gap-6 p-8">
@@ -52,6 +75,14 @@ export default async function IntegrationStatusPage() {
         <p className="text-sm text-slate-500">
           Manual checklist — tick off each metric once you've personally confirmed it's tracking correctly for that site.
         </p>
+        {hiddenCount > 0 && (
+          <Link
+            href={showHidden ? "/integration-status" : "/integration-status?showHidden=1"}
+            className="mt-1 inline-block text-xs font-medium text-indigo-600 hover:text-indigo-700"
+          >
+            {showHidden ? "Hide inactive sites" : `Show ${hiddenCount} hidden site${hiddenCount === 1 ? "" : "s"}`}
+          </Link>
+        )}
       </div>
 
       {properties.length === 0 ? (
@@ -78,13 +109,25 @@ export default async function IntegrationStatusPage() {
                 </tr>
               </thead>
               <tbody>
-                {properties.map((p) => {
+                {properties.map((p, index) => {
                   const row = checklist.get(p.propertyId);
                   const notes = notesByProperty.get(p.propertyId) ?? [];
+                  const visibleIds = properties.map((pp) => pp.propertyId);
                   return (
                     <tr key={p.propertyId} className="border-b border-slate-100 last:border-0">
                       <td className="sticky left-0 z-10 bg-white px-4 py-3 font-medium text-slate-900">
-                        {p.displayName} <span className="text-slate-400">({p.accountName})</span>
+                        <div className="flex items-center gap-2">
+                          <IntegrationRowControls
+                            propertyId={p.propertyId}
+                            hidden={row?.hidden ?? false}
+                            orderedPropertyIds={visibleIds}
+                            canMoveUp={index > 0}
+                            canMoveDown={index < properties.length - 1}
+                          />
+                          <span>
+                            {p.displayName} <span className="text-slate-400">({p.accountName})</span>
+                          </span>
+                        </div>
                       </td>
                       {CHECKLIST_COLUMNS.map((column) => (
                         <td key={column} className="px-3 py-3 text-center">

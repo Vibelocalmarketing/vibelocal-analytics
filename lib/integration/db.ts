@@ -19,7 +19,11 @@ export const CHECKLIST_COLUMNS = [
 ] as const;
 
 export type ChecklistColumn = (typeof CHECKLIST_COLUMNS)[number];
-export type ChecklistRow = { property_id: string } & Record<ChecklistColumn, boolean>;
+export type ChecklistRow = {
+  property_id: string;
+  hidden: boolean;
+  sort_order: number | null;
+} & Record<ChecklistColumn, boolean>;
 export type Note = { id: string; property_id: string; note: string; created_at: string };
 
 export async function getChecklist(): Promise<Map<string, ChecklistRow>> {
@@ -31,6 +35,16 @@ export async function getChecklist(): Promise<Map<string, ChecklistRow>> {
     map.set(row.property_id, row);
   }
   return map;
+}
+
+// Rows never explicitly reordered have sort_order = null — fall back to
+// their natural position from the GA4 API (the order listProperties returns).
+export function orderPropertyIds(propertyIds: string[], checklist: Map<string, ChecklistRow>): string[] {
+  return [...propertyIds].sort((a, b) => {
+    const orderA = checklist.get(a)?.sort_order ?? propertyIds.indexOf(a);
+    const orderB = checklist.get(b)?.sort_order ?? propertyIds.indexOf(b);
+    return orderA - orderB;
+  });
 }
 
 export async function getAllNotes(): Promise<Map<string, Note[]>> {
