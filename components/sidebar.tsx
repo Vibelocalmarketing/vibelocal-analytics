@@ -10,6 +10,7 @@ import {
   Target,
   LogOut,
   Sparkles,
+  ListChecks,
 } from "lucide-react";
 import { signOut } from "@/lib/auth/actions";
 
@@ -67,6 +68,13 @@ export function Sidebar() {
           >
             <Target className="h-4 w-4" />
             Google Ads Optimization
+          </Link>
+          <Link
+            href="/integration-status"
+            className={linkClass(pathname === "/integration-status")}
+          >
+            <ListChecks className="h-4 w-4" />
+            Integration Status
           </Link>
         </div>
       </nav>
