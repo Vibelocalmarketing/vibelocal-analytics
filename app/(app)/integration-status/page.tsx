@@ -129,9 +129,7 @@ export default async function IntegrationStatusPage({
                             canMoveUp={index > 0}
                             canMoveDown={index < properties.length - 1}
                           />
-                          <span>
-                            {p.displayName} <span className="text-slate-400">({p.accountName})</span>
-                          </span>
+                          <span>{p.displayName}</span>
                         </div>
                       </td>
                       {CHECKLIST_COLUMNS.map((column) => (
