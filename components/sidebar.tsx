@@ -15,7 +15,7 @@ import { signOut } from "@/lib/auth/actions";
 
 const analyticsLinks = [
   { href: "/analytics/whole-site", label: "Whole Site Analytics", icon: Globe },
-  { href: "/analytics/url", label: "URL Analytics", icon: Link2 },
+  { href: "/analytics/url", label: "Single Page Analytics", icon: Link2 },
 ];
 
 export function Sidebar() {

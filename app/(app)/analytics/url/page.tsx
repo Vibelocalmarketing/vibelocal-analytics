@@ -169,7 +169,7 @@ export default async function UrlAnalyticsPage({
     <div className="flex flex-col gap-6 p-8">
       <div>
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-semibold text-slate-900">URL Analytics</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">Single Page Analytics</h1>
           <TrackingAlertIcon messages={alerts} />
         </div>
         <p className="text-sm text-slate-500">Connected as {connection.google_email}</p>
