@@ -186,7 +186,7 @@ export default async function WholeSiteAnalyticsPage({
             type="date"
             name="start"
             defaultValue={start}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
           />
         </div>
 
@@ -197,7 +197,7 @@ export default async function WholeSiteAnalyticsPage({
             type="date"
             name="end"
             defaultValue={end}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
           />
         </div>
 
@@ -206,7 +206,7 @@ export default async function WholeSiteAnalyticsPage({
           <select
             name="compare"
             defaultValue={compareMode}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
           >
             <option value="none">No comparison</option>
             <option value="previous">Previous period (same length)</option>
