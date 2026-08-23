@@ -169,7 +169,7 @@ export default async function WholeSiteAnalyticsPage({
           <select
             name="property"
             defaultValue={propertyId}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
           >
             {properties.map((p) => (
               <option key={p.propertyId} value={p.propertyId}>
