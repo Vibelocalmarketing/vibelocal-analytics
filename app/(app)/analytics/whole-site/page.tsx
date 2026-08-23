@@ -150,7 +150,7 @@ export default async function WholeSiteAnalyticsPage({
     <div className="flex flex-col gap-6 p-8">
       <div>
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-semibold text-slate-900">Whole Site Analytics</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">Site-Wide Analytics</h1>
           <TrackingAlertIcon messages={alerts} />
         </div>
         <p className="text-sm text-slate-500">
