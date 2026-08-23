@@ -308,7 +308,7 @@ export default async function WholeSiteAnalyticsPage({
           {...statProps(addToCarts, compareAddToCarts, compareRangeLabel)}
         />
         <StatCard
-          label="Google Ads Visits"
+          label="Google Ads Clicks"
           value={googleAdsVisits.toLocaleString()}
           icon={Megaphone}
           {...statProps(googleAdsVisits, compareGoogleAdsVisits, compareRangeLabel)}
