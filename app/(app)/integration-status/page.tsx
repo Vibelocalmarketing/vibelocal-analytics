@@ -93,11 +93,11 @@ export default async function IntegrationStatusPage({
             <table className="w-full min-w-[1100px] border-collapse text-sm">
               <thead>
                 <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500">
-                  <th className="sticky left-0 z-10 bg-white px-4 py-3">Website</th>
+                  <th className="sticky left-0 top-0 z-30 bg-white px-4 py-3">Website</th>
                   {CHECKLIST_COLUMNS.map((column) => {
                     const { label, icon: Icon } = COLUMN_META[column];
                     return (
-                      <th key={column} className="px-3 py-3 text-center">
+                      <th key={column} className="sticky top-0 z-20 bg-white px-3 py-3 text-center">
                         <span className="flex flex-col items-center gap-1">
                           <Icon className="h-3.5 w-3.5 text-slate-400" />
                           {label}
@@ -105,7 +105,7 @@ export default async function IntegrationStatusPage({
                       </th>
                     );
                   })}
-                  <th className="px-3 py-3 text-center">Notes</th>
+                  <th className="sticky top-0 z-20 bg-white px-3 py-3 text-center">Notes</th>
                 </tr>
               </thead>
               <tbody>
