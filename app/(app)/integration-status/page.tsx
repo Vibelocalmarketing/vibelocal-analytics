@@ -89,7 +89,12 @@ export default async function IntegrationStatusPage({
         <p className="text-sm text-slate-500">No GA4 properties found on this account.</p>
       ) : (
         <form action={saveWithIds} className="flex flex-col gap-4">
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+          {/* max-h + overflow-y here (not just overflow-x) is required for the sticky
+              header to work: overflow-x-auto alone makes browsers implicitly treat
+              overflow-y as auto too, which makes `sticky` stick to this div's own
+              scrollport — but that scrollport never actually scrolls unless we give
+              it a bounded height and let it scroll internally. */}
+          <div className="max-h-[75vh] overflow-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
             <table className="w-full min-w-[1100px] border-collapse text-sm">
               <thead>
                 <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500">
