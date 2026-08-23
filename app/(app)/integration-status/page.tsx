@@ -94,23 +94,23 @@ export default async function IntegrationStatusPage({
               overflow-y as auto too, which makes `sticky` stick to this div's own
               scrollport — but that scrollport never actually scrolls unless we give
               it a bounded height and let it scroll internally. */}
-          <div className="max-h-[75vh] overflow-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <table className="w-full min-w-[1100px] border-collapse text-sm">
+          <div className="max-h-[75vh] overflow-y-auto overflow-x-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <table className="w-full table-fixed border-collapse text-xs">
               <thead>
-                <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500">
-                  <th className="sticky left-0 top-0 z-30 bg-white px-4 py-3">Website</th>
+                <tr className="border-b border-slate-200 text-left text-[10px] font-medium text-slate-500">
+                  <th className="sticky left-0 top-0 z-30 w-[18%] bg-white px-2 py-1.5">Website</th>
                   {CHECKLIST_COLUMNS.map((column) => {
                     const { label, icon: Icon } = COLUMN_META[column];
                     return (
-                      <th key={column} className="sticky top-0 z-20 bg-white px-3 py-3 text-center">
-                        <span className="flex flex-col items-center gap-1">
-                          <Icon className="h-3.5 w-3.5 text-slate-400" />
+                      <th key={column} className="sticky top-0 z-20 w-[9%] bg-white px-1 py-1.5 text-center">
+                        <span className="flex flex-col items-center gap-0.5 break-words">
+                          <Icon className="h-3 w-3 text-slate-400" />
                           {label}
                         </span>
                       </th>
                     );
                   })}
-                  <th className="sticky top-0 z-20 bg-white px-3 py-3 text-center">Notes</th>
+                  <th className="sticky top-0 z-20 w-[10%] bg-white px-1 py-1.5 text-center">Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -120,8 +120,8 @@ export default async function IntegrationStatusPage({
                   const visibleIds = properties.map((pp) => pp.propertyId);
                   return (
                     <tr key={p.propertyId} className="border-b border-slate-100 last:border-0">
-                      <td className="sticky left-0 z-10 bg-white px-4 py-3 font-medium text-slate-900">
-                        <div className="flex items-center gap-2">
+                      <td className="sticky left-0 z-10 bg-white px-2 py-1.5 font-medium text-slate-900">
+                        <div className="flex items-center gap-1">
                           <IntegrationRowControls
                             propertyId={p.propertyId}
                             hidden={row?.hidden ?? false}
@@ -129,20 +129,20 @@ export default async function IntegrationStatusPage({
                             canMoveUp={index > 0}
                             canMoveDown={index < properties.length - 1}
                           />
-                          <span>{p.displayName}</span>
+                          <span className="break-words">{p.displayName}</span>
                         </div>
                       </td>
                       {CHECKLIST_COLUMNS.map((column) => (
-                        <td key={column} className="px-3 py-3 text-center">
+                        <td key={column} className="px-1 py-1.5 text-center">
                           <input
                             type="checkbox"
                             name={`${p.propertyId}__${column}`}
                             defaultChecked={row?.[column] ?? false}
-                            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                            className="h-3.5 w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                           />
                         </td>
                       ))}
-                      <td className="px-3 py-3 text-center">
+                      <td className="px-1 py-1.5 text-center">
                         <IntegrationNotesPopover propertyId={p.propertyId} notes={notes} />
                       </td>
                     </tr>
