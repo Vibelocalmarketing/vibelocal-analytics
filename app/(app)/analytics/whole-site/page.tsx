@@ -45,7 +45,10 @@ const googleAdsFilter = {
 };
 
 function deltaPct(current: number, previous: number): number | null {
-  if (previous === 0) return null;
+  // Previous period had nothing to divide by. If the current period also has
+  // nothing, there's no real change to report. If it has something now, that's
+  // a genuine increase from zero — Infinity is a sentinel StatCard renders as "New".
+  if (previous === 0) return current > 0 ? Infinity : null;
   return ((current - previous) / previous) * 100;
 }
 

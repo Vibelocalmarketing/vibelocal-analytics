@@ -38,7 +38,7 @@ export function StatCard({
               }`}
             >
               {positive ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />}
-              {Math.abs(deltaPct!).toFixed(1)}%
+              {Number.isFinite(deltaPct) ? `${Math.abs(deltaPct!).toFixed(1)}%` : "New"}
             </span>
           )}
           <span className="font-semibold text-slate-600">
