@@ -6,6 +6,9 @@ export function classifyEvent(eventName: string): EventType {
   if (n.includes("phone") || n.includes("call")) return "phone";
   if (n.includes("form") && n.includes("start")) return "form_start";
   if (n.includes("form") && (n.includes("submit") || n.includes("complete"))) return "form_submit";
+  // Wix's native form GA4 integration fires "generate_lead" instead of a
+  // "form_submit"-style name on successful submission — same meaning.
+  if (n === "generate_lead") return "form_submit";
   return "other";
 }
 
