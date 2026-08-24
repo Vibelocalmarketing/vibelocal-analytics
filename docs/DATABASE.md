@@ -109,7 +109,13 @@ alter table call_clicks_log enable row level security;
 alter table call_clicks_log drop column log_date;
 alter table call_clicks_log add column log_month text not null;
 alter table call_clicks_log add constraint call_clicks_log_property_month_key unique (property_id, log_month);
+
+alter table call_clicks_log add column sort_order integer;
 ```
+
+`sort_order` powers manual up/down reordering per property (month labels are
+free text, so there's no natural chronological sort) — `null` means "not yet
+reordered," falling back to `created_at desc`.
 
 No foreign key to `auth.users`, so nothing to add to `lib/auth/delete-account.ts`.
 

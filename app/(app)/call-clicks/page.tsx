@@ -4,7 +4,7 @@ import { getChecklist, applyIntegrationOrder } from "@/lib/integration/db";
 import { getEntriesForProperty } from "@/lib/callclicks/db";
 import { addEntry } from "@/lib/callclicks/actions";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
-import { DeleteCallEntryButton } from "@/components/delete-call-entry-button";
+import { CallClickRow } from "@/components/call-click-row";
 
 export default async function CallClicksPage({
   searchParams,
@@ -170,23 +170,15 @@ export default async function CallClicksPage({
                 </td>
               </tr>
             ) : (
-              entries.map((e) => {
-                const total = e.google_ads_call_clicks + e.website_call_clicks + e.gmb_call_clicks;
-                return (
-                  <tr key={e.id} className="border-b border-slate-100 last:border-0">
-                    <td className="px-4 py-3 font-medium text-slate-900">{e.log_month}</td>
-                    <td className="px-3 py-3 text-center text-slate-900">{e.google_ads_call_clicks.toLocaleString()}</td>
-                    <td className="px-3 py-3 text-center text-slate-900">{e.website_call_clicks.toLocaleString()}</td>
-                    <td className="px-3 py-3 text-center text-slate-900">{e.gmb_call_clicks.toLocaleString()}</td>
-                    <td className="px-3 py-3 text-center font-semibold text-slate-900">
-                      {total.toLocaleString()}
-                    </td>
-                    <td className="px-3 py-3 text-center">
-                      <DeleteCallEntryButton id={e.id} />
-                    </td>
-                  </tr>
-                );
-              })
+              entries.map((e, index) => (
+                <CallClickRow
+                  key={e.id}
+                  entry={e}
+                  orderedEntryIds={entries.map((entry) => entry.id)}
+                  canMoveUp={index > 0}
+                  canMoveDown={index < entries.length - 1}
+                />
+              ))
             )}
           </tbody>
         </table>
