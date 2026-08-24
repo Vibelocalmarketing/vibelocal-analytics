@@ -56,7 +56,7 @@ export function CallClickRow({
               <input type="number" name="website_call_clicks" min={0} defaultValue={entry.website_call_clicks} className={inputClass} />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-medium text-slate-500">GMB</label>
+              <label className="text-[11px] font-medium text-slate-500">GBP</label>
               <input type="number" name="gmb_call_clicks" min={0} defaultValue={entry.gmb_call_clicks} className={inputClass} />
             </div>
             <button

@@ -115,7 +115,7 @@ export default async function CallClicksPage({
         </div>
         <div className="flex flex-col gap-1">
           <label className="flex items-center gap-1 text-xs font-medium text-slate-500">
-            <MapPin className="h-3.5 w-3.5" /> GMB Call Clicks
+            <MapPin className="h-3.5 w-3.5" /> GBP Call Clicks
           </label>
           <input
             type="number"
@@ -153,7 +153,7 @@ export default async function CallClicksPage({
               <th className="px-3 py-3 text-center">
                 <span className="flex flex-col items-center gap-1">
                   <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                  GMB Call Clicks
+                  GBP Call Clicks
                 </span>
               </th>
               <th className="px-3 py-3 text-center">
