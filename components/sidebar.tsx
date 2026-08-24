@@ -18,6 +18,7 @@ import { signOut } from "@/lib/auth/actions";
 const analyticsLinks = [
   { href: "/analytics/whole-site", label: "Site-Wide Analytics", icon: Globe },
   { href: "/analytics/url", label: "Single Page Analytics", icon: Link2 },
+  { href: "/call-clicks", label: "Overall Phone Clicks", icon: PhoneCall },
 ];
 
 export function Sidebar() {
@@ -76,13 +77,6 @@ export function Sidebar() {
           >
             <ListChecks className="h-4 w-4" />
             Integration Status
-          </Link>
-          <Link
-            href="/call-clicks"
-            className={linkClass(pathname === "/call-clicks")}
-          >
-            <PhoneCall className="h-4 w-4" />
-            Call Clicks
           </Link>
         </div>
       </nav>
