@@ -10,6 +10,7 @@ import {
   Megaphone,
 } from "lucide-react";
 import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4";
+import { getChecklist, applyIntegrationOrder } from "@/lib/integration/db";
 import { comparisonRange, defaultRangeFor, formatRangeLabel, type CompareMode } from "@/lib/analytics/period";
 import { sumByType, sumEventName, toEventRows, type EventRow } from "@/lib/analytics/events";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
@@ -65,7 +66,8 @@ export default async function UrlAnalyticsPage({
     );
   }
 
-  const properties = await listProperties();
+  const [allProperties, checklist] = await Promise.all([listProperties(), getChecklist()]);
+  const properties = applyIntegrationOrder(allProperties, checklist);
   const params = await searchParams;
   const propertyId = params.property || properties[0]?.propertyId;
   const defaults = defaultRangeFor("day");

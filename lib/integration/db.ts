@@ -47,6 +47,22 @@ export function orderPropertyIds(propertyIds: string[], checklist: Map<string, C
   });
 }
 
+// Applies the same hide + reorder rules set on the Integration Status page
+// to any other list of GA4 properties (e.g. the analytics page dropdowns),
+// so a property hidden/reordered there stays consistent everywhere.
+export function applyIntegrationOrder<T extends { propertyId: string }>(
+  properties: T[],
+  checklist: Map<string, ChecklistRow>,
+): T[] {
+  const visible = properties.filter((p) => !checklist.get(p.propertyId)?.hidden);
+  const orderedIds = orderPropertyIds(
+    visible.map((p) => p.propertyId),
+    checklist,
+  );
+  const byId = new Map(visible.map((p) => [p.propertyId, p]));
+  return orderedIds.map((id) => byId.get(id)!);
+}
+
 export async function getAllNotes(): Promise<Map<string, Note[]>> {
   const { data, error } = await supabaseAdmin()
     .from("integration_notes")

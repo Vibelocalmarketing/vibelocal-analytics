@@ -1,5 +1,6 @@
 import { Users, MousePointerClick, Phone, CheckCircle2, Eye, UserPlus, ShoppingCart, Megaphone } from "lucide-react";
 import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4";
+import { getChecklist, applyIntegrationOrder } from "@/lib/integration/db";
 import {
   comparisonRange,
   defaultRangeFor,
@@ -71,7 +72,8 @@ export default async function WholeSiteAnalyticsPage({
     );
   }
 
-  const properties = await listProperties();
+  const [allProperties, checklist] = await Promise.all([listProperties(), getChecklist()]);
+  const properties = applyIntegrationOrder(allProperties, checklist);
   const params = await searchParams;
 
   const propertyId = params.property || properties[0]?.propertyId;
