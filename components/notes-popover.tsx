@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { StickyNote, Pencil, Trash2, X, Check } from "lucide-react";
 
 type Note = { id: string; note: string; created_at: string };
@@ -60,8 +61,15 @@ export function NotesPopover({
         )}
       </button>
 
-      {open && (
-        <div className="absolute right-0 top-full z-20 mt-2 w-80 rounded-xl border border-slate-200 bg-white p-4 shadow-lg">
+      {open &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 p-4">
+            <div
+              role="presentation"
+              className="absolute inset-0"
+              onClick={() => setOpen(false)}
+            />
+            <div className="relative z-10 w-80 rounded-xl border border-slate-200 bg-white p-4 shadow-2xl">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-semibold text-slate-900">Notes</span>
             <button type="button" onClick={() => setOpen(false)} aria-label="Close">
@@ -133,8 +141,10 @@ export function NotesPopover({
               Add note
             </button>
           </div>
-        </div>
-      )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
