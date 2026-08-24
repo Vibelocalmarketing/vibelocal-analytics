@@ -80,6 +80,39 @@ alter table integration_notes enable row level security;
 
 No foreign key to `auth.users`, so nothing to add to `lib/auth/delete-account.ts`.
 
+### `call_clicks_log`
+
+Manual monthly log of call clicks per GA4 property (`property_id`), from
+three sources Rex checks himself and types in — Google Ads call extension
+clicks, website phone-link clicks, and Google Business Profile call clicks.
+`log_month` is free-form text (e.g. "August 2026"), not a real date — Rex
+types whatever label he wants, not a calendar picker. One row per property
+per month label (`unique (property_id, log_month)` — logging the same label
+again updates that row instead of duplicating). Total is computed from the
+three columns at render time, not stored.
+
+```sql
+create table call_clicks_log (
+  id uuid primary key default gen_random_uuid(),
+  property_id text not null,
+  google_ads_call_clicks integer not null default 0,
+  website_call_clicks integer not null default 0,
+  gmb_call_clicks integer not null default 0,
+  created_at timestamptz not null default now(),
+  unique (property_id, log_date)
+);
+
+revoke all on call_clicks_log from anon, authenticated;
+alter table call_clicks_log enable row level security;
+-- No policies: service-role client only, never read from the browser.
+
+alter table call_clicks_log drop column log_date;
+alter table call_clicks_log add column log_month text not null;
+alter table call_clicks_log add constraint call_clicks_log_property_month_key unique (property_id, log_month);
+```
+
+No foreign key to `auth.users`, so nothing to add to `lib/auth/delete-account.ts`.
+
 ## Adding the next table
 
 - Record its purpose, columns, and RLS policy here with the exact SQL.

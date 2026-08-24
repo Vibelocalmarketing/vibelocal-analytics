@@ -11,6 +11,7 @@ import {
   LogOut,
   Sparkles,
   ListChecks,
+  PhoneCall,
 } from "lucide-react";
 import { signOut } from "@/lib/auth/actions";
 
@@ -75,6 +76,13 @@ export function Sidebar() {
           >
             <ListChecks className="h-4 w-4" />
             Integration Status
+          </Link>
+          <Link
+            href="/call-clicks"
+            className={linkClass(pathname === "/call-clicks")}
+          >
+            <PhoneCall className="h-4 w-4" />
+            Call Clicks
           </Link>
         </div>
       </nav>
