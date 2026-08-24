@@ -17,9 +17,9 @@ import {
   CHECKLIST_COLUMNS,
   type ChecklistColumn,
 } from "@/lib/integration/db";
-import { saveChecklist } from "@/lib/integration/actions";
+import { saveChecklist, addNote, updateNote, deleteNote } from "@/lib/integration/actions";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
-import { IntegrationNotesPopover } from "@/components/integration-notes-popover";
+import { NotesPopover } from "@/components/notes-popover";
 import { IntegrationRowControls } from "@/components/integration-row-controls";
 
 const COLUMN_META: Record<ChecklistColumn, { label: string; icon: typeof Users }> = {
@@ -143,7 +143,13 @@ export default async function IntegrationStatusPage({
                         </td>
                       ))}
                       <td className="px-1 py-1.5 text-center">
-                        <IntegrationNotesPopover propertyId={p.propertyId} notes={notes} />
+                        <NotesPopover
+                          subjectId={p.propertyId}
+                          notes={notes}
+                          onAdd={addNote}
+                          onUpdate={updateNote}
+                          onDelete={deleteNote}
+                        />
                       </td>
                     </tr>
                   );

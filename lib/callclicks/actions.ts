@@ -47,6 +47,35 @@ export async function deleteEntry(id: string) {
   revalidatePath("/call-clicks");
 }
 
+export async function addNote(entryId: string, note: string) {
+  const trimmed = note.trim();
+  if (!trimmed) return;
+
+  const { error } = await supabaseAdmin()
+    .from("call_clicks_notes")
+    .insert({ entry_id: entryId, note: trimmed });
+  if (error) throw error;
+
+  revalidatePath("/call-clicks");
+}
+
+export async function updateNote(id: string, note: string) {
+  const trimmed = note.trim();
+  if (!trimmed) return;
+
+  const { error } = await supabaseAdmin().from("call_clicks_notes").update({ note: trimmed }).eq("id", id);
+  if (error) throw error;
+
+  revalidatePath("/call-clicks");
+}
+
+export async function deleteNote(id: string) {
+  const { error } = await supabaseAdmin().from("call_clicks_notes").delete().eq("id", id);
+  if (error) throw error;
+
+  revalidatePath("/call-clicks");
+}
+
 export async function moveEntry(entryIds: string[], entryId: string, direction: "up" | "down") {
   const index = entryIds.indexOf(entryId);
   const swapWith = direction === "up" ? index - 1 : index + 1;

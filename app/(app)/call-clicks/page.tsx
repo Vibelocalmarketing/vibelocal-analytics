@@ -1,7 +1,7 @@
 import { Megaphone, Globe2, MapPin, Sigma } from "lucide-react";
 import { getStoredConnection, listProperties } from "@/lib/google/ga4";
 import { getChecklist, applyIntegrationOrder } from "@/lib/integration/db";
-import { getEntriesForProperty } from "@/lib/callclicks/db";
+import { getEntriesForProperty, getAllCallClickNotes } from "@/lib/callclicks/db";
 import { addEntry } from "@/lib/callclicks/actions";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { CallClickRow } from "@/components/call-click-row";
@@ -34,7 +34,10 @@ export default async function CallClicksPage({
     );
   }
 
-  const entries = await getEntriesForProperty(propertyId);
+  const [entries, notesByEntry] = await Promise.all([
+    getEntriesForProperty(propertyId),
+    getAllCallClickNotes(),
+  ]);
   const addEntryWithProperty = addEntry.bind(null, propertyId);
 
   return (
@@ -174,6 +177,7 @@ export default async function CallClicksPage({
                 <CallClickRow
                   key={e.id}
                   entry={e}
+                  notes={notesByEntry.get(e.id) ?? []}
                   orderedEntryIds={entries.map((entry) => entry.id)}
                   canMoveUp={index > 0}
                   canMoveDown={index < entries.length - 1}

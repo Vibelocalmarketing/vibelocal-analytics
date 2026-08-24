@@ -117,6 +117,28 @@ alter table call_clicks_log add column sort_order integer;
 free text, so there's no natural chronological sort) — `null` means "not yet
 reordered," falling back to `created_at desc`.
 
+### `call_clicks_notes`
+
+Free-form notes attached to a single `call_clicks_log` entry (`entry_id`),
+shown in that row's notes popup on the Call Clicks page. Same shape and UI
+component (`components/notes-popover.tsx`) as `integration_notes`, just
+scoped to a month entry instead of a whole property.
+
+```sql
+create table call_clicks_notes (
+  id uuid primary key default gen_random_uuid(),
+  entry_id uuid not null,
+  note text not null,
+  created_at timestamptz not null default now()
+);
+
+revoke all on call_clicks_notes from anon, authenticated;
+alter table call_clicks_notes enable row level security;
+-- No policies: service-role client only, never read from the browser.
+```
+
+No foreign key to `auth.users`, so nothing to add to `lib/auth/delete-account.ts`.
+
 No foreign key to `auth.users`, so nothing to add to `lib/auth/delete-account.ts`.
 
 ## Adding the next table

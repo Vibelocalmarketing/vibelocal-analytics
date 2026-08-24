@@ -2,11 +2,22 @@
 
 import { useState, useTransition } from "react";
 import { StickyNote, Pencil, Trash2, X, Check } from "lucide-react";
-import { addNote, updateNote, deleteNote } from "@/lib/integration/actions";
 
 type Note = { id: string; note: string; created_at: string };
 
-export function IntegrationNotesPopover({ propertyId, notes }: { propertyId: string; notes: Note[] }) {
+export function NotesPopover({
+  subjectId,
+  notes,
+  onAdd,
+  onUpdate,
+  onDelete,
+}: {
+  subjectId: string;
+  notes: Note[];
+  onAdd: (subjectId: string, text: string) => Promise<void>;
+  onUpdate: (id: string, text: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+}) {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState("");
@@ -23,14 +34,14 @@ export function IntegrationNotesPopover({ propertyId, notes }: { propertyId: str
     const text = editDraft;
     if (!id) return;
     setEditingId(null);
-    startTransition(() => updateNote(id, text));
+    startTransition(() => onUpdate(id, text));
   }
 
   function submitNewNote() {
     const text = newNote;
     if (!text.trim()) return;
     setNewNote("");
-    startTransition(() => addNote(propertyId, text));
+    startTransition(() => onAdd(subjectId, text));
   }
 
   return (
@@ -93,7 +104,7 @@ export function IntegrationNotesPopover({ propertyId, notes }: { propertyId: str
                       </button>
                       <button
                         type="button"
-                        onClick={() => startTransition(() => deleteNote(n.id))}
+                        onClick={() => startTransition(() => onDelete(n.id))}
                         aria-label="Delete note"
                       >
                         <Trash2 className="h-3.5 w-3.5 text-slate-400 hover:text-red-500" />

@@ -2,16 +2,19 @@
 
 import { useState, useTransition } from "react";
 import { ChevronUp, ChevronDown, Pencil, Trash2 } from "lucide-react";
-import { updateEntry, deleteEntry, moveEntry } from "@/lib/callclicks/actions";
-import type { CallClicksEntry } from "@/lib/callclicks/db";
+import { updateEntry, deleteEntry, moveEntry, addNote, updateNote, deleteNote } from "@/lib/callclicks/actions";
+import type { CallClicksEntry, CallClickNote } from "@/lib/callclicks/db";
+import { NotesPopover } from "@/components/notes-popover";
 
 export function CallClickRow({
   entry,
+  notes,
   orderedEntryIds,
   canMoveUp,
   canMoveDown,
 }: {
   entry: CallClicksEntry;
+  notes: CallClickNote[];
   orderedEntryIds: string[];
   canMoveUp: boolean;
   canMoveDown: boolean;
@@ -105,6 +108,7 @@ export function CallClickRow({
       <td className="px-3 py-3 text-center font-semibold text-slate-900">{total.toLocaleString()}</td>
       <td className="px-3 py-3 text-center">
         <div className="flex items-center justify-center gap-2.5">
+          <NotesPopover subjectId={entry.id} notes={notes} onAdd={addNote} onUpdate={updateNote} onDelete={deleteNote} />
           <button type="button" onClick={() => setEditing(true)} aria-label="Edit entry">
             <Pencil className="h-4 w-4 text-slate-400 transition hover:text-indigo-500" />
           </button>

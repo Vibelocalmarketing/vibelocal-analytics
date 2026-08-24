@@ -28,3 +28,24 @@ export async function getEntriesForProperty(propertyId: string): Promise<CallCli
     return orderA - orderB;
   });
 }
+
+export type CallClickNote = { id: string; entry_id: string; note: string; created_at: string };
+
+// Same "fetch everything, group in JS" pattern as integration_notes — note
+// volume is small enough for this internal tool that filtering by entry_id
+// isn't worth a separate query per row.
+export async function getAllCallClickNotes(): Promise<Map<string, CallClickNote[]>> {
+  const { data, error } = await supabaseAdmin()
+    .from("call_clicks_notes")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+
+  const map = new Map<string, CallClickNote[]>();
+  for (const note of (data ?? []) as CallClickNote[]) {
+    const list = map.get(note.entry_id) ?? [];
+    list.push(note);
+    map.set(note.entry_id, list);
+  }
+  return map;
+}
