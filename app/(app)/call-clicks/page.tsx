@@ -175,9 +175,9 @@ export default async function CallClicksPage({
                 return (
                   <tr key={e.id} className="border-b border-slate-100 last:border-0">
                     <td className="px-4 py-3 font-medium text-slate-900">{e.log_month}</td>
-                    <td className="px-3 py-3 text-center">{e.google_ads_call_clicks.toLocaleString()}</td>
-                    <td className="px-3 py-3 text-center">{e.website_call_clicks.toLocaleString()}</td>
-                    <td className="px-3 py-3 text-center">{e.gmb_call_clicks.toLocaleString()}</td>
+                    <td className="px-3 py-3 text-center text-slate-900">{e.google_ads_call_clicks.toLocaleString()}</td>
+                    <td className="px-3 py-3 text-center text-slate-900">{e.website_call_clicks.toLocaleString()}</td>
+                    <td className="px-3 py-3 text-center text-slate-900">{e.gmb_call_clicks.toLocaleString()}</td>
                     <td className="px-3 py-3 text-center font-semibold text-slate-900">
                       {total.toLocaleString()}
                     </td>
