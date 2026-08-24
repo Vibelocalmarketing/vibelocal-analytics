@@ -4,7 +4,6 @@ import {
   Eye,
   UserPlus,
   Phone,
-  FileText,
   CheckCircle2,
   ShoppingCart,
   Megaphone,
@@ -334,12 +333,6 @@ export default async function UrlAnalyticsPage({
               value={phoneClicks.toLocaleString()}
               icon={Phone}
               {...statProps(phoneClicks, comparePhoneClicks, compareRangeLabel)}
-            />
-            <StatCard
-              label="Form Starts"
-              value={formStarts.toLocaleString()}
-              icon={FileText}
-              {...statProps(formStarts, compareFormStarts, compareRangeLabel)}
             />
             <StatCard
               label="Form Submissions"
