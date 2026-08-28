@@ -127,6 +127,20 @@ If the site has more than one distinct form (e.g. a dedicated ad landing page fo
 
 `Add to Cart` will legitimately always read zero for a non-ecommerce lead-gen business. That's correct, not a bug — don't flag it.
 
+**If a real, correctly-filled-out form submission genuinely fails to complete (no confirmation message, `form_submit`/`generate_lead` never fires even after a real human tries), don't stop at "inconclusive" — this is the highest-severity thing this skill can find, since it means the site may be silently losing every real lead while everything else looks fine. Check specifically whether the form uses a CAPTCHA (a `.g-recaptcha` div, an hCaptcha/Turnstile widget, etc.):**
+
+```js
+const captchaDiv = document.querySelector('.g-recaptcha');
+JSON.stringify({
+  captchaDivExists: !!captchaDiv,
+  iframeRendered: !!(captchaDiv && captchaDiv.querySelector('iframe')),
+  grecaptchaLoaded: typeof window.grecaptcha,
+  recaptchaScriptPresent: [...document.querySelectorAll('script[src]')].some(s => s.src.includes('recaptcha')),
+});
+```
+
+A CAPTCHA container that exists in the HTML but never actually renders (no iframe, `grecaptcha` undefined, no recaptcha script tag anywhere) means the widget can **never** be solved by anyone — not "bots are blocked," but "100% of real humans are blocked too," silently, with no visible error most visitors would notice. Found once already: a caching/JS-minify plugin (W3 Total Cache in that case) stripped the reCAPTCHA script from the page entirely. Report this as a critical finding, not a minor one, and flag it before anything else in Step 7's summary.
+
 ## Step 6 — Check every page that matters, not just one
 
 If the site has custom-built landing pages living as isolated Wix HTML iframe embeds (common pattern in this agency's work — a page split into 1-2 HTML embeds with a native Wix form in the gap between them), each embed has its **own separately hardcoded** `gtag` script, because iframes can't inherit the parent site's tag. A fix to the site-wide tag does not reach these. Grep the local project directory for the old measurement ID to find every file affected — there's often more than one (a header/hero embed and a content/footer embed, sometimes multiple landing page variants).
@@ -134,6 +148,8 @@ If the site has custom-built landing pages living as isolated Wix HTML iframe em
 The regular pages (built with native Wix elements, not custom embeds) share one global header/footer, so testing the tag on one regular page is representative of all of them — no need to click through every single page in the sitemap.
 
 ## Step 7 — Report findings
+
+If a real form submission silently fails (see Step 5), lead with that — it's more urgent than any tracking gap, since it means the client is actively losing leads right now, not just under-measuring them. Don't bury it in the table below.
 
 Summarize per metric, plain language, no code:
 
