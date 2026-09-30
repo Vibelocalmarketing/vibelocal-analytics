@@ -27,6 +27,16 @@ export function sumByType(events: EventRow[], type: EventType): number {
   return events.filter((e) => classifyEvent(e.eventName) === type).reduce((s, e) => s + e.count, 0);
 }
 
+// Sites whose leads book through an outside link (e.g. Calendly) instead of an
+// on-site form. Their pages fire a custom "booking_click" GA4 event, shown as
+// its own "Booking Clicks" box only for these properties.
+const BOOKING_CLICK_SITES = ["livefullynowrehab"];
+
+export function tracksBookingClicks(propertyDisplayName: string | undefined): boolean {
+  const name = (propertyDisplayName ?? "").toLowerCase();
+  return BOOKING_CLICK_SITES.some((site) => name.includes(site));
+}
+
 export function sumEventName(events: EventRow[], eventName: string): number {
   return events.filter((e) => e.eventName === eventName).reduce((s, e) => s + e.count, 0);
 }

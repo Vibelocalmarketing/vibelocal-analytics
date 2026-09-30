@@ -7,11 +7,12 @@ import {
   CheckCircle2,
   ShoppingCart,
   Megaphone,
+  CalendarCheck,
 } from "lucide-react";
 import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4";
 import { getChecklist, applyIntegrationOrder } from "@/lib/integration/db";
 import { comparisonRange, defaultRangeFor, formatRangeLabel, type CompareMode } from "@/lib/analytics/period";
-import { sumByType, sumEventName, toEventRows, type EventRow } from "@/lib/analytics/events";
+import { sumByType, sumEventName, toEventRows, tracksBookingClicks, type EventRow } from "@/lib/analytics/events";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
 import { DateRangePresets } from "@/components/date-range-presets";
@@ -182,12 +183,15 @@ export default async function UrlAnalyticsPage({
   const formStarts = sumByType(events, "form_start");
   const formSubmits = sumByType(events, "form_submit");
   const addToCarts = sumEventName(events, "add_to_cart");
+  const showBookingClicks = tracksBookingClicks(properties.find((p) => p.propertyId === propertyId)?.displayName);
+  const bookingClicks = sumEventName(events, "booking_click");
   const firstVisits = sumEventName(events, "first_visit");
 
   const comparePhoneClicks = compareEvents ? sumByType(compareEvents, "phone") : null;
   const compareFormStarts = compareEvents ? sumByType(compareEvents, "form_start") : null;
   const compareFormSubmits = compareEvents ? sumByType(compareEvents, "form_submit") : null;
   const compareAddToCarts = compareEvents ? sumEventName(compareEvents, "add_to_cart") : null;
+  const compareBookingClicks = compareEvents ? sumEventName(compareEvents, "booking_click") : null;
   const compareFirstVisits = compareEvents ? sumEventName(compareEvents, "first_visit") : null;
 
   const alerts: string[] = [];
@@ -346,6 +350,14 @@ export default async function UrlAnalyticsPage({
               icon={ShoppingCart}
               {...statProps(addToCarts, compareAddToCarts, compareRangeLabel)}
             />
+            {showBookingClicks && (
+              <StatCard
+                label="Booking Clicks"
+                value={bookingClicks.toLocaleString()}
+                icon={CalendarCheck}
+                {...statProps(bookingClicks, compareBookingClicks, compareRangeLabel)}
+              />
+            )}
             <StatCard
               label="Google Ads Clicks"
               value={googleAdsVisits.toLocaleString()}

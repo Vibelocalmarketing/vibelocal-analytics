@@ -1,4 +1,4 @@
-import { Users, MousePointerClick, Phone, CheckCircle2, Eye, UserPlus, ShoppingCart, Megaphone } from "lucide-react";
+import { Users, MousePointerClick, Phone, CheckCircle2, Eye, UserPlus, ShoppingCart, Megaphone, CalendarCheck } from "lucide-react";
 import { getStoredConnection, listProperties, runReport } from "@/lib/google/ga4";
 import { getChecklist, applyIntegrationOrder } from "@/lib/integration/db";
 import {
@@ -7,7 +7,7 @@ import {
   formatRangeLabel,
   type CompareMode,
 } from "@/lib/analytics/period";
-import { sumByType, sumEventName, toEventRows } from "@/lib/analytics/events";
+import { sumByType, sumEventName, toEventRows, tracksBookingClicks } from "@/lib/analytics/events";
 import { Ga4ConnectBanner } from "@/components/ga4-connect-banner";
 import { StatCard } from "@/components/stat-card";
 import { DateRangePresets } from "@/components/date-range-presets";
@@ -163,12 +163,15 @@ export default async function WholeSiteAnalyticsPage({
   const phoneClicks = sumByType(currentEvents, "phone");
   const formSubmits = sumByType(currentEvents, "form_submit");
   const addToCarts = sumEventName(currentEvents, "add_to_cart");
+  const showBookingClicks = tracksBookingClicks(properties.find((p) => p.propertyId === propertyId)?.displayName);
+  const bookingClicks = sumEventName(currentEvents, "booking_click");
   const firstVisits = sumEventName(currentEvents, "first_visit");
 
   const compareEvents = compareEventsReport ? toEventRows(compareEventsReport) : null;
   const comparePhoneClicks = compareEvents ? sumByType(compareEvents, "phone") : null;
   const compareFormSubmits = compareEvents ? sumByType(compareEvents, "form_submit") : null;
   const compareAddToCarts = compareEvents ? sumEventName(compareEvents, "add_to_cart") : null;
+  const compareBookingClicks = compareEvents ? sumEventName(compareEvents, "booking_click") : null;
   const compareFirstVisits = compareEvents ? sumEventName(compareEvents, "first_visit") : null;
 
   const alerts: string[] = [];
@@ -312,6 +315,14 @@ export default async function WholeSiteAnalyticsPage({
           icon={ShoppingCart}
           {...statProps(addToCarts, compareAddToCarts, compareRangeLabel)}
         />
+        {showBookingClicks && (
+          <StatCard
+            label="Booking Clicks"
+            value={bookingClicks.toLocaleString()}
+            icon={CalendarCheck}
+            {...statProps(bookingClicks, compareBookingClicks, compareRangeLabel)}
+          />
+        )}
         <StatCard
           label="Google Ads Clicks"
           value={googleAdsVisits.toLocaleString()}
